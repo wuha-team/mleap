@@ -2,21 +2,22 @@ package ml.combust.mleap.runtime.tokenizer
 
 
 
-import ml.combust.mleap.core.feature.TagTokenizerModel
+import ml.combust.mleap.core.feature.createTagTokenizerModel
 import org.apache.spark.ml.feature.Tokenizer
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, Dataset}
 
 
-class TagTokenizer(listVocab: Seq[String]=Seq[String](""), keepTokens: Boolean=true, useCoreNLP: Boolean=false) extends Tokenizer  {
+class TagTokenizer(stemVocabulary: Seq[String]=Seq[String](""), filterVocabulary: Boolean=false, filterNoun: Boolean=false) extends Tokenizer  {
 
   override def setInputCol(value: String): this.type = set(inputCol, value)
   override def setOutputCol(value: String): this.type = set(outputCol, value)
 
+  val vocab = stemVocabulary
+  val onlyVocabProvided = filterVocabulary
+  val coreNLP = filterNoun
 
-  val vocab = listVocab
-  val keepAllTokens = keepTokens
-  val coreNLP = useCoreNLP
+  val tokenizerModel = new createTagTokenizerModel(vocab, onlyVocabProvided, coreNLP)
 
 
   override def transform(dataset: Dataset[_]): DataFrame = {
@@ -24,7 +25,7 @@ class TagTokenizer(listVocab: Seq[String]=Seq[String](""), keepTokens: Boolean=t
   }
 
 
-  def tokenizerUDF = udf ((textContents: String) =>  TagTokenizerModel.defaultTokenizer.apply(textContents))
+  def tokenizerUDF = udf ((textContents: String) =>  tokenizerModel.tokenizer.apply(textContents))
 
 
 }

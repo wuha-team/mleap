@@ -79,17 +79,19 @@ object WordTaggerAnalyzer extends Serializable {
 
 }
 
-object TagTokenizerModel {
-  val defaultTokenizer = TagTokenizerModel()
+
+class createTagTokenizerModel(vocab: Seq[String] =Seq[String](""), onlyVocabProvided: Boolean=false, coreNLP: Boolean=false) extends Serializable{
+  val tokenizer = TagTokenizerModel(vocab, onlyVocabProvided, coreNLP)
 }
+
 
 /** Class for a custom tokenizer model.
   *
   * @param vocab vocabulary provided by user
-  * @param keepAllTokens keep all tokens if it's true
+  * @param onlyVocabProvided keep  only vocabulary provided by user
   * @param coreNLP only noun are kept if it's true
   */
-case class TagTokenizerModel(vocab: Seq[String] =Seq[String](""), keepAllTokens: Boolean=true, coreNLP: Boolean=false) extends Model {
+case class TagTokenizerModel(vocab: Seq[String], onlyVocabProvided: Boolean, coreNLP: Boolean) extends Model {
 
   /**
     * Multiple regex to create custom features
@@ -179,7 +181,7 @@ case class TagTokenizerModel(vocab: Seq[String] =Seq[String](""), keepAllTokens:
   }
 
   def filterToken(token: String): Boolean = {
-    if (keepAllTokens) true else vocab.contains(token)
+    if (onlyVocabProvided) vocab.contains(token) else true
   }
 
 

@@ -19,14 +19,23 @@ class TagTokenizerOp extends SimpleSparkOp[TagTokenizer] {
     override def opName: String = Bundle.BuiltinOps.feature.tag_tokenizer
 
     override def store(model: Model, obj: TagTokenizer)
-                      (implicit context: BundleContext[SparkBundleContext]): Model = { model }
+                      (implicit context: BundleContext[SparkBundleContext]): Model = {
+      model.withValue("vocab", Value.stringList(obj.vocab))
+        .withValue("onlyVocabProvided", Value.boolean(obj.onlyVocabProvided))
+        .withValue("coreNLP", Value.boolean(obj.coreNLP))
+    }
 
     override def load(model: Model)
-                     (implicit context: BundleContext[SparkBundleContext]): TagTokenizer = new TagTokenizer(Seq[String](""))
+                     (implicit context: BundleContext[SparkBundleContext]): TagTokenizer = {
+      val vocab = model.value("vocab").getStringList
+      val keepTokens = model.value("onlyVocabProvided").getBoolean
+      val coreNLP = model.value("coreNLP").getBoolean
+      new TagTokenizer(vocab, keepTokens, coreNLP)
+    }
   }
 
   override def sparkLoad(uid: String, shape: NodeShape, model: TagTokenizer): TagTokenizer = {
-    new TagTokenizer(model.vocab, model.keepAllTokens, model.coreNLP)
+    new TagTokenizer(model.vocab, model.onlyVocabProvided, model.coreNLP)
   }
 
   override def sparkInputs(obj: TagTokenizer): Seq[ParamSpec] = {

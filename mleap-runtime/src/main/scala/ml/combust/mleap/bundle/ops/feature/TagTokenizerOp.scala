@@ -19,16 +19,18 @@ class TagTokenizerOp extends MleapOp[TagTokenizer, TagTokenizerModel] {
 
     override def store(model: Model, obj: TagTokenizerModel)
                       (implicit context: BundleContext[MleapContext]): Model = {
-      model
-//      model.withValue("vocab", Value.stringList(obj.vocab))
-//      model.withValue("keepAllTokens", Value.boolean(obj.keepAllTokens))
-//      model.withValue("coreNLP", Value.boolean(obj.coreNLP))
+
+      model.withValue("vocab", Value.stringList(obj.vocab))
+      model.withValue("onlyVocabProvided", Value.boolean(obj.onlyVocabProvided))
+      model.withValue("coreNLP", Value.boolean(obj.coreNLP))
     }
 
     override def load(model: Model)
                      (implicit context: BundleContext[MleapContext]): TagTokenizerModel = {
-
-      TagTokenizerModel()
+      val vocab = model.value("vocab").getStringList
+      val keepTokens = model.value("onlyVocabProvided").getBoolean
+      val coreNLP = model.value("coreNLP").getBoolean
+      TagTokenizerModel(vocab, keepTokens, coreNLP)
 
     }
   }
