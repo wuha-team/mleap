@@ -2,7 +2,7 @@ package ml.combust.mleap.runtime.transformer.classification
 
 import ml.combust.mleap.core.classification.GBTClassifierModel
 import ml.combust.mleap.core.types._
-import ml.combust.mleap.runtime.test.TestUtil
+import ml.combust.mleap.runtime.tokenizer.TestUtil
 import ml.combust.mleap.runtime.frame.{DefaultLeapFrame, Row}
 import ml.combust.mleap.tensor.Tensor
 import org.scalatest.FunSpec

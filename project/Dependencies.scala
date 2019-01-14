@@ -18,6 +18,7 @@ object Dependencies {
   val tensorflowVersion = "1.11.0"
   val xgboostVersion = "0.81"
   val hadoopVersion = "2.6.5" // matches spark version
+  val elasticSearchVersion = "6.4.0"
 
   object Compile {
     val sparkMllibLocal = "org.apache.spark" %% "spark-mllib-local" % sparkVersion excludeAll(ExclusionRule(organization = "org.scalatest"))
@@ -66,6 +67,10 @@ object Dependencies {
     val xgboostDep = "ml.dmlc" % "xgboost4j" % xgboostVersion
     val xgboostSparkDep = "ml.dmlc" % "xgboost4j-spark" % xgboostVersion
     val hadoop = "org.apache.hadoop" % "hadoop-client" % hadoopVersion
+
+
+    val lucene = Seq("org.apache.lucene" % "lucene-analyzers-common" % elasticSearchVersion,
+      "org.apache.lucene" % "lucene-core" % elasticSearchVersion)
   }
 
   object Test {
@@ -94,7 +99,7 @@ object Dependencies {
 
   val base = l ++= Seq()
 
-  val core = l ++= Seq(sparkMllibLocal, jTransform, Test.scalaTest)
+  val core = l ++= Seq(sparkMllibLocal, jTransform, Test.scalaTest) ++ lucene
 
   def runtime(scalaVersion: SettingKey[String]) = l ++= (Seq(Test.scalaTest, Test.junit, Test.junitInterface) ++ scalaReflect.modules(scalaVersion.value))
 
@@ -132,6 +137,7 @@ object Dependencies {
   val benchmark = l ++= Seq(scalameter, scopt, sparkAvro) ++ Compile.spark
 
   val databricksRuntimeTestkit = l ++= Provided.spark ++ Seq(sparkAvro)
+
 
   object DependencyHelpers {
     case class ScalaVersionDependentModuleID(modules: String => Seq[ModuleID]) {

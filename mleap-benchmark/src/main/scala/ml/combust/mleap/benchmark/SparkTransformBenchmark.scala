@@ -23,9 +23,12 @@ class SparkTransformBenchmark extends Benchmark {
     }).tried.flatMap(identity).get.root
 
     val spark = SparkSession.builder().
-      appName("Spark Benchmarks").
-      master("local[1]").
-      getOrCreate()
+      appName("Spark Benchmarks").master("local[1]")
+      .config("spark.ui.enabled", "false")
+      .config("spark.driver.allowMultipleContexts", "true")
+      .config("spark.default.parallelism", "8")
+      .config("spark.executor.cores", "2")
+      .getOrCreate()
 
     val slowFrame = spark.sqlContext.read.avro(new File(config.getString("frame-path")).getAbsolutePath)
     val data = slowFrame.collect().toSeq

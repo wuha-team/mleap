@@ -7,7 +7,7 @@ import ml.combust.bundle.BundleFile
 import ml.combust.bundle.serializer.SerializationFormat
 import ml.combust.mleap.core.feature.StandardScalerModel
 import ml.combust.mleap.core.types._
-import ml.combust.mleap.runtime.test.TestUtil
+import ml.combust.mleap.runtime.tokenizer.TestUtil
 import org.apache.spark.ml.linalg.Vectors
 import org.scalatest.FunSpec
 import resource.managed

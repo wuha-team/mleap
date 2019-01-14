@@ -28,9 +28,14 @@ class XGBoostClassificationModelParitySpec extends FunSpec
   with BeforeAndAfterAll {
 
   val spark = SparkSession.builder().
-    master("local[2]").
-    appName("XGBoostRegressionModelParitySpec").
-    getOrCreate()
+    master("local[*]").
+    appName("XGBoostRegressionModelParitySpec")
+    .config("spark.ui.enabled", "false")
+    .config("spark.driver.allowMultipleContexts", "true")
+    .config("spark.default.parallelism", "8")
+    .config("spark.executor.cores", "2")
+    .getOrCreate()
+
 
   override protected def afterAll(): Unit = {
     spark.stop()

@@ -31,6 +31,11 @@ object SparkParityBase extends FunSpec {
     spark.sqlContext.read.text(getClass.getClassLoader.getResource("datasources/carroll-alice.txt").toString).
       withColumnRenamed("value", "text")
   }
+
+  def frTextDataset(spark: SparkSession): DataFrame = {
+    spark.sqlContext.read.text(getClass.getClassLoader.getResource("datasources/lyon.txt").toString).
+      withColumnRenamed("value", "text")
+  }
   def dataset(spark: SparkSession): DataFrame = {
     spark.sqlContext.read.avro(getClass.getClassLoader.getResource("datasources/lending_club_sample.avro").toString)
   }
@@ -54,14 +59,20 @@ abstract class SparkParityBase extends FunSpec with BeforeAndAfterAll {
   lazy val baseDataset: DataFrame = SparkParityBase.dataset(spark)
   lazy val textDataset: DataFrame = SparkParityBase.textDataset(spark)
   lazy val recommendationDataset: DataFrame = SparkParityBase.recommendationDataset(spark)
+  lazy val frTextDataset: DataFrame = SparkParityBase.frTextDataset(spark)
 
   val dataset: DataFrame
   val sparkTransformer: Transformer
 
   lazy val spark = SparkSession.builder().
     appName("Spark/MLeap Parity Tests").
-    master("local[2]").
-    getOrCreate()
+    master("local[*]")
+    .config("spark.ui.enabled", "false")
+    .config("spark.driver.allowMultipleContexts", "true")
+    .config("spark.default.parallelism", "8")
+    .config("spark.executor.cores", "2")
+    .getOrCreate()
+
 
   override protected def afterAll(): Unit = spark.stop()
 
@@ -133,16 +144,17 @@ abstract class SparkParityBase extends FunSpec with BeforeAndAfterAll {
     val sparkElems = sparkDataset.collect()
     val mleapElems = mleapDataset.collect()
     assert(sparkElems sameElements mleapElems)
+
   }
 
   def parityTransformer(): Unit = {
     it("has parity between Spark/MLeap") {
+
       val sparkTransformed = sparkTransformer.transform(dataset)
       implicit val sbc = SparkBundleContext().withDataset(sparkTransformed)
       val mTransformer = mleapTransformer(sparkTransformer)
       val sparkDataset = sparkTransformed.toSparkLeapFrame.toSpark
       val mleapDataset = mTransformer.sparkTransform(dataset)
-
       equalityTest(sparkDataset, mleapDataset)
     }
 

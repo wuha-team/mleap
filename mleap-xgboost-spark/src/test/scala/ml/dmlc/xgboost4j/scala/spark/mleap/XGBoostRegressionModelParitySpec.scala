@@ -8,10 +8,10 @@ import ml.combust.mleap.core.types.{ScalarType, StructField, StructType}
 import ml.combust.mleap.runtime.frame
 import ml.combust.mleap.runtime.frame.{DefaultLeapFrame, Row}
 import ml.dmlc.xgboost4j.scala.spark.XGBoostRegressor
+import org.apache.spark.ml.Transformer
 import org.apache.spark.ml.bundle.SparkBundleContext
-import org.apache.spark.ml.linalg.Vector
-import org.apache.spark.ml.{Pipeline, Transformer}
 import org.apache.spark.ml.feature.VectorAssembler
+import org.apache.spark.ml.linalg.Vector
 import org.apache.spark.ml.mleap.SparkUtil
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.scalatest.{BeforeAndAfterAll, FunSpec}
@@ -24,10 +24,15 @@ case class PowerPlantTable(AT: Double, V : Double, AP : Double, RH : Double, PE 
 
 class XGBoostRegressionModelParitySpec extends FunSpec
   with BeforeAndAfterAll {
-  val spark = SparkSession.builder().
-    master("local[2]").
-    appName("XGBoostRegressionModelParitySpec").
-    getOrCreate()
+  val spark = SparkSession.builder()
+    .master("local[*]")
+    .appName("XGBoostRegressionModelParitySpec")
+    .config("spark.ui.enabled", "false")
+    .config("spark.driver.allowMultipleContexts", "true")
+    .config("spark.default.parallelism", "8")
+    .config("spark.executor.cores", "2")
+    .getOrCreate()
+
 
   override protected def afterAll(): Unit = {
     spark.stop()

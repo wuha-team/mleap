@@ -39,10 +39,14 @@ case class MyTransformer() extends Transformer {
 class SparkTransformBuilderSpec extends FunSpec {
   describe("transformer with multiple outputs") {
     it("works with Spark as well") {
-      val spark = SparkSession.builder().
-        appName("Spark/MLeap Parity Tests").
-        master("local[2]").
-        getOrCreate()
+      val spark = SparkSession.builder()
+        .appName("Spark/MLeap Parity Tests")
+        .master("local[*]")
+        .config("spark.ui.enabled", "false")
+        .config("spark.driver.allowMultipleContexts", "true")
+        .config("spark.default.parallelism", "8")
+        .config("spark.executor.cores", "2")
+        .getOrCreate()
       val schema = new StructType().
         add("input", DoubleType)
       val data = Seq(Row(45.7d)).asJava

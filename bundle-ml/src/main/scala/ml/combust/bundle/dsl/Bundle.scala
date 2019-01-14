@@ -56,6 +56,7 @@ object Bundle {
       val imputer = "imputer"
       val standard_scaler = "standard_scaler"
       val tokenizer = "tokenizer"
+      val tag_tokenizer = "tag_tokenizer"
       val vector_assembler = "vector_assembler"
       val one_hot_encoder = "one_hot_encoder"
       val min_max_scaler = "min_max_scaler"

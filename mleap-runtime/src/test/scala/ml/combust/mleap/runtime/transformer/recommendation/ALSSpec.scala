@@ -7,7 +7,7 @@ import ml.combust.bundle.BundleFile
 import ml.combust.bundle.serializer.SerializationFormat
 import ml.combust.mleap.core.recommendation.ALSModel
 import ml.combust.mleap.core.types.{NodeShape, ScalarType, StructField}
-import ml.combust.mleap.runtime.test.TestUtil
+import ml.combust.mleap.runtime.tokenizer.TestUtil
 import org.scalatest.FunSpec
 import resource.managed
 import ml.combust.mleap.runtime.MleapSupport._
