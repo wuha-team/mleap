@@ -4,6 +4,7 @@ package ml.combust.mleap.runtime.tokenizer
 
 import ml.combust.mleap.core.feature.createTagTokenizerModel
 import org.apache.spark.ml.feature.Tokenizer
+import org.apache.spark.ml.param.ParamMap
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.{DataFrame, Dataset}
 
@@ -20,12 +21,14 @@ class TagTokenizer(stemVocabulary: Seq[String]=Seq[String](""), filterVocabulary
   val tokenizerModel = new createTagTokenizerModel(vocab, onlyVocabProvided, coreNLP)
 
 
+  def tokenizerUDF = udf ((textContents: String) =>  tokenizerModel.tokenizer.apply(textContents))
+
   override def transform(dataset: Dataset[_]): DataFrame = {
     dataset.withColumn(${outputCol}, tokenizerUDF(col(${inputCol})))
   }
 
-
-  def tokenizerUDF = udf ((textContents: String) =>  tokenizerModel.tokenizer.apply(textContents))
+  override def copy(extra: ParamMap): TagTokenizer =
+    copyValues(new TagTokenizer(stemVocabulary, filterVocabulary, filterNoun), extra)
 
 
 }
