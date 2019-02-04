@@ -1,5 +1,6 @@
-import ml.combust.mleap.{Dependencies, Common, Protobuf}
+import ml.combust.mleap.{Common, Dependencies, Protobuf}
 
 Common.defaultBundleSettings
 Protobuf.bundleSettings
 Dependencies.bundleMl
+

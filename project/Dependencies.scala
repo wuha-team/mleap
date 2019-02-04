@@ -21,7 +21,8 @@ object Dependencies {
   val elasticSearchVersion = "6.4.0"
 
   object Compile {
-    val sparkMllibLocal = "org.apache.spark" %% "spark-mllib-local" % sparkVersion excludeAll(ExclusionRule(organization = "org.scalatest"))
+    val sparkMllibLocal = "org.apache.spark" %% "spark-mllib-local" % sparkVersion excludeAll(ExclusionRule(organization = "org.scalatest"),
+      ExclusionRule(organization = "org.slf4j") )
     val spark = Seq("org.apache.spark" %% "spark-core" % sparkVersion,
       "org.apache.spark" %% "spark-sql" % sparkVersion,
       "org.apache.spark" %% "spark-mllib" % sparkVersion,
@@ -88,6 +89,7 @@ object Dependencies {
   object Provided {
     val spark = Compile.spark.map(_.excludeAll(ExclusionRule(organization = "org.scalatest"))).map(_ % "provided")
     val hadoop = Compile.hadoop % "provided"
+    val lucene = Compile.lucene.map(_.excludeAll(ExclusionRule(organization = "org.scalatest"))).map(_ % "provided")
   }
 
   import Compile._
@@ -101,7 +103,7 @@ object Dependencies {
 
   val base = l ++= Seq()
 
-  val core = l ++= Seq(sparkMllibLocal, jTransform, Test.scalaTest) ++ lucene
+  val core = l ++= Seq(sparkMllibLocal, jTransform, Test.scalaTest) ++ Provided.lucene
 
   def runtime(scalaVersion: SettingKey[String]) = l ++= (Seq(Test.scalaTest, Test.junit, Test.junitInterface) ++ scalaReflect.modules(scalaVersion.value))
 
